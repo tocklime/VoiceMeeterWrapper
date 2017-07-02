@@ -42,6 +42,10 @@ namespace VoiceMeeterWrapper
             VoiceMeeterRemote.GetParameter($"Bus[{busNum}].{s}", ref output);
             return output;
         }
+        public void SetRecorderArmStrip(int s, bool armed)
+        {
+            VoiceMeeterRemote.SetParameter($"Recorder.ArmStrip({s})", armed ? 1 : 0);
+        }
         public float GetRecorderArmStrip(int s)
         {
             float output = -1;

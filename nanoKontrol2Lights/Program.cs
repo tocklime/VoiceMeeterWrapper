@@ -11,7 +11,17 @@ namespace nanoKontrol2Lights
 {
     class Program
     {
-        private static int GetNanoKontrolDevice()
+        private static int GetNanoKontrolInputDevice()
+        {
+            for(int i = 0; i < InputDevice.DeviceCount; i++)
+            {
+                var info = InputDevice.GetDeviceCapabilities(i);
+                if (info.name.Contains("nanoKONTROL"))
+                    return i;
+            }
+            return -1;
+        }
+        private static int GetNanoKontrolOutputDevice()
         {
             for(int i = 0; i < OutputDevice.DeviceCount; i++)
             {
@@ -28,9 +38,24 @@ namespace nanoKontrol2Lights
         static void Main(string[] args)
         {
 
-            using (var od = new OutputDevice(GetNanoKontrolDevice()))
+            using (var od = new OutputDevice(GetNanoKontrolOutputDevice()))
+            using (var id = new InputDevice(GetNanoKontrolInputDevice()))
             using (var vb = new VmClient())
             {
+                id.ChannelMessageReceived += (ob,e)=>
+                {
+                    var m = e.Message;
+                    if (m.MessageType == MessageType.Channel && m.Command == ChannelCommand.Controller && m.Data2 == 127)
+                    {
+                        if(m.Data1 >= 64 && m.Data1 <= 68)
+                        {
+                            var slider = m.Data1 - 64;
+                            var current = vb.GetRecorderArmStrip(slider);
+                            vb.SetRecorderArmStrip(slider,current != 1);
+                        }
+                    }
+                };
+                id.StartRecording();
                 vb.OnClose(() =>
                 {
                     var all = new[] { 32, 33, 34, 35, 36, 41, 45, 48, 49, 50, 51, 52, 53, 54, 55, 64, 65, 66, 67, 68 };
@@ -75,6 +100,10 @@ namespace nanoKontrol2Lights
 
                 }
             }
+        }
+
+        private static void Id_ChannelMessageReceived(object sender, ChannelMessageEventArgs e)
+        {
         }
     }
 }
