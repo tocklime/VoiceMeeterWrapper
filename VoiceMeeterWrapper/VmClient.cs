@@ -75,10 +75,7 @@ namespace VoiceMeeterWrapper
         }
         public void Dispose()
         {
-            if(_onClose != null)
-            {
-                _onClose();
-            }
+            _onClose?.Invoke();
             VoiceMeeterRemote.Logout();
         }
         public void OnClose(Action a)
