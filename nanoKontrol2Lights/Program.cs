@@ -19,17 +19,17 @@ namespace nanoKontrol2Lights
                 if (info.name.Contains("nanoKONTROL"))
                     return i;
             }
-            return -1;
+            throw new Exception("Cannot find input midi device with 'nanoKONTROL' in the name.");
         }
         private static int GetNanoKontrolOutputDevice()
         {
-            for(int i = 0; i < OutputDevice.DeviceCount; i++)
+            for(int i = 0; i < OutputDeviceBase.DeviceCount; i++)
             {
-                var info = OutputDevice.GetDeviceCapabilities(i);
+                var info = OutputDeviceBase.GetDeviceCapabilities(i);
                 if (info.name.Contains("nanoKONTROL"))
                     return i;
             }
-            return -1;
+            throw new Exception("Cannot find output midi device with 'nanoKONTROL' in the name.");
         }
         private static void SetLight(OutputDevice od, int controlNum, float value)
         {
