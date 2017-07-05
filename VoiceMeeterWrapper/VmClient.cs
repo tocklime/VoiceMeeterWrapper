@@ -36,6 +36,16 @@ namespace VoiceMeeterWrapper
                     throw new InvalidOperationException("Bad response from voicemeeter: " + lr);
             }
         }
+        public float GetParam(string n)
+        {
+            float output = -1;
+            VoiceMeeterRemote.GetParameter(n, ref output);
+            return output;
+        }
+        public void SetParam(string n,float v)
+        {
+            VoiceMeeterRemote.SetParameter(n, v);
+        }
         public float GetParam(BusNumProperty s,int busNum)
         {
             float output = -1;

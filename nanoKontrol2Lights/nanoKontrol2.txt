@@ -1,0 +1,30 @@
+﻿#Example config file.
+#Solo inputs
+32<=Strip[0].Solo;
+33<=Strip[1].Solo;
+34<=Strip[2].Solo;
+35<=Strip[3].Solo;
+36<=Strip[4].Solo;
+
+#Mute inputs
+48<=Strip[0].Mute;
+49<=Strip[1].Mute;
+50<=Strip[2].Mute;
+51<=Strip[3].Mute;
+52<=Strip[4].Mute;
+
+#Mute outputs
+53<=Bus[0].Mute;
+54<=Bus[1].Mute;
+55<=Bus[2].Mute;
+
+#Recording buttons:
+45<=recorder.record;
+41<=recorder.play;
+
+#Record lights:
+64<=>Recorder.ArmStrip(0);
+65<=>Recorder.ArmStrip(1);
+66<=>Recorder.ArmStrip(2);
+67<=>Recorder.ArmStrip(3);
+68<=>Recorder.ArmStrip(4);
