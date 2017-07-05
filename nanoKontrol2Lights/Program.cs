@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using VoiceMeeterWrapper;
-using LanguageExt;
 
 namespace nanoKontrol2Lights
 {

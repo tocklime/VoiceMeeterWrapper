@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LanguageExt.Prelude;
-using LanguageExt.Parsec;
-using static LanguageExt.Parsec.Prim;
-using static LanguageExt.Parsec.Char;
-using LanguageExt;
+using Sprache;
 
 namespace nanoKontrol2Lights
 {
     public static class ConfigParsing
     {
         public static Parser<BindingDir> binding =>
-            from l in optional(ch('<'))
-            from _ in ch('=')
-            from r in optional(ch('>'))
-            select (l.IsSome ? BindingDir.ToBoard : 0) | (r.IsSome ? BindingDir.FromBoard : 0);
-        public static Parser<Option<int>> boardControlId => asInteger(many(digit));
-        public static Parser<string> voiceMeeterId => asString(manyUntil(anyChar, ch(';')));
+            from l in Parse.Optional(Parse.Char('<'))
+            from _ in Parse.Char('=')
+            from r in Parse.Optional(Parse.Char('>'))
+            select (l.IsDefined ? BindingDir.ToBoard : 0) | (r.IsDefined ? BindingDir.FromBoard : 0);
+        public static Parser<int> boardControlId => Parse.Number.Select(x=>int.Parse(x));//.asInteger(many(digit));
+        public static Parser<string> voiceMeeterId => Parse.Char(x => char.IsLetterOrDigit(x) || "()[].".IndexOf(x) > -1, "Letter, digit or ()[].").AtLeastOnce().Text().Token();
 
         public class BindingLine
         {
@@ -25,33 +21,35 @@ namespace nanoKontrol2Lights
             public int ControlId { get; set; }
             public string VoicemeeterParam { get; set; }
         }
-        public static Parser<Unit> comment =>
-            from _1 in ch('#')
-            from _2 in many(noneOf('\n'))
-            select unit;
+        public static Parser<int> comment =>
+            from _1 in Parse.Char('#')
+            from _2 in Parse.Until(Parse.AnyChar, Parse.Char('\n'))
+            select 0;
 
         public static Parser<BindingLine> readBindLine =>
-            from _ in many(choice(skipMany1(space), comment))
-            from oc in boardControlId
-            where oc.IsSome
-            from _1 in spaces
-            from b in binding
-            from _2 in spaces
-            from v in voiceMeeterId
+            from c in readComment.Token().Many()
+            from oc in boardControlId.Token()
+            from b in binding.Token()
+            from v in voiceMeeterId.Token()
+            from semi in Parse.Char(';')
             select new BindingLine
             {
                 Dir = b,
-                ControlId = oc.Single(),
+                ControlId = oc,
                 VoicemeeterParam = v
             };
+        public static Parser<int> readComment =>
+            from h in Parse.Char('#')
+            from x in Parse.CharExcept('\n').AtLeastOnce()
+            from nl in Parse.Char('\n')
+            select 0;
         public static IEnumerable<BindingLine> ParseConfig(string text)
         {
-            var x = parse(many(readBindLine), text);
-            if (x.IsFaulted)
-            {
-                throw new Exception($"Bad parse in config file: {x.Reply.Error}");
-            }
-            return x.Reply.Result.AsEnumerable();
+            var x = readBindLine.AtLeastOnce().TryParse(text);
+            if (x.WasSuccessful)
+                return x.Value;
+            else
+                throw new Exception($"Can't read config file: {x.Message}");
         }
     }
 }
