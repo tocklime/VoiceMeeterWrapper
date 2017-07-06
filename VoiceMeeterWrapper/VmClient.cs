@@ -46,39 +46,6 @@ namespace VoiceMeeterWrapper
         {
             VoiceMeeterRemote.SetParameter(n, v);
         }
-        public float GetParam(BusNumProperty s,int busNum)
-        {
-            float output = -1;
-            VoiceMeeterRemote.GetParameter($"Bus[{busNum}].{s}", ref output);
-            return output;
-        }
-        public void SetRecorderArmStrip(int s, bool armed)
-        {
-            VoiceMeeterRemote.SetParameter($"Recorder.ArmStrip({s})", armed ? 1 : 0);
-        }
-        public float GetRecorderArmStrip(int s)
-        {
-            float output = -1;
-            VoiceMeeterRemote.GetParameter($"Recorder.ArmStrip({s})", ref output);
-            return output;
-        }
-        public float GetParam(StripNumProperty s,int stripNum)
-        {
-            float output = -1;
-            VoiceMeeterRemote.GetParameter($"Strip[{stripNum}].{s}", ref output);
-            return output;
-        }
-        public string GetParam(StripStringProperty s,int stripNum)
-        {
-            string output = "";
-            VoiceMeeterRemote.GetParameter($"Strip[{stripNum}].{s}", ref output);
-            return output;
-        }
-        public float GetParam(RecorderProperty s) {
-            float output = -1;
-            VoiceMeeterRemote.GetParameter($"recorder.{s}", ref output);
-            return output;
-        }
         public bool Poll()
         {
             return VoiceMeeterRemote.IsParametersDirty() == 1;

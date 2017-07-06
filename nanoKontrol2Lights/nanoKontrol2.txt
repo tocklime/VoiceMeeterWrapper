@@ -1,30 +1,46 @@
-﻿#Example config file.
+﻿MIDI Device: nanoKONTROL
+#Example config file.
 #Solo inputs
-32<=Strip[0].Solo;
-33<=Strip[1].Solo;
-34<=Strip[2].Solo;
-35<=Strip[3].Solo;
-36<=Strip[4].Solo;
+32 0..127 toggle <=> Strip[0].Solo 0..1; # End of line comment?
+33 0..127 toggle <=> Strip[1].Solo 0..1;
+34 toggle <=> Strip[2].Solo;
+35 toggle <=> Strip[3].Solo;
+36 toggle <=> Strip[4].Solo;
 
 #Mute inputs
-48<=Strip[0].Mute;
-49<=Strip[1].Mute;
-50<=Strip[2].Mute;
-51<=Strip[3].Mute;
-52<=Strip[4].Mute;
+48 toggle <=> Strip[0].Mute;
+49 toggle <=> Strip[1].Mute;
+50 toggle <=> Strip[2].Mute;
+51 toggle <=> Strip[3].Mute;
+52 toggle <=> Strip[4].Mute;
 
 #Mute outputs
-53<=Bus[0].Mute;
-54<=Bus[1].Mute;
-55<=Bus[2].Mute;
+53 toggle <=> Bus[0].Mute;
+54 toggle <=> Bus[1].Mute;
+55 toggle <=> Bus[2].Mute;
 
 #Recording buttons:
-45<=recorder.record;
-41<=recorder.play;
+41 toggle <=> recorder.play;
+42 toggle <=> recorder.stop;
+# rewind and fastforward don't seem to work. I might have the names wrong.
+#43 toggle <=> recorder.rewind;
+#44 toggle <=> recorder.fastforward 0..100;
+45 toggle <=> recorder.record;
 
 #Record lights:
-64<=>Recorder.ArmStrip(0);
-65<=>Recorder.ArmStrip(1);
-66<=>Recorder.ArmStrip(2);
-67<=>Recorder.ArmStrip(3);
-68<=>Recorder.ArmStrip(4);
+64 toggle <=> Recorder.ArmStrip(0);
+65 toggle <=> Recorder.ArmStrip(1);
+66 toggle <=> Recorder.ArmStrip(2);
+67 toggle <=> Recorder.ArmStrip(3);
+68 toggle <=> Recorder.ArmStrip(4);
+
+0 0..127 => Strip[0].Gain -60..0;
+1 0..127 => Strip[1].Gain -60..0;
+2 0..127 => Strip[2].Gain -60..0;
+3 0..127 => Strip[3].Gain -60..0;
+4 0..127 => Strip[4].Gain -60..0;
+5 0..127 => Bus[0].Gain -60..0;
+6 0..127 => Bus[1].Gain -60..0;
+7 0..127 => Bus[2].Gain -60..0;
+
+46 => Control.Restart;

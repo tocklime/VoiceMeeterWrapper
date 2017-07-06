@@ -40,12 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusNumProperty.cs" />
-    <Compile Include="Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RecorderProperty.cs" />
-    <Compile Include="StripNumProperty.cs" />
-    <Compile Include="StripStringProperty.cs" />
     <Compile Include="VbLoginResponse.cs" />
     <Compile Include="VmClient.cs" />
     <Compile Include="VoiceMeeterRemote.cs" />
