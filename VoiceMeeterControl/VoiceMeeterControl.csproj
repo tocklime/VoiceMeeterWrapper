@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{6FA751E5-EDE3-4EDA-A337-E2AA8FA035DC}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>nanoKontrol2Lights</RootNamespace>
-    <AssemblyName>nanoKontrol2Lights</AssemblyName>
+    <RootNamespace>VoiceMeeterControl</RootNamespace>
+    <AssemblyName>VoiceMeeterControl</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -93,9 +93,7 @@
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="nanoKontrol2.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <EmbeddedResource Include="config.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

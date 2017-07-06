@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace nanoKontrol2Lights
+namespace VoiceMeeterControl
 {
     [Flags]
     public enum BindingDir

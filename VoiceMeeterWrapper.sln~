@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceMeeterWrapper", "VoiceMeeterWrapper\VoiceMeeterWrapper.csproj", "{D9C0F0D7-1A04-45DC-8115-9C31946417D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceMeeterControl", "VoiceMeeterControl\VoiceMeeterControl.csproj", "{6FA751E5-EDE3-4EDA-A337-E2AA8FA035DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceMeeterControl", "nanoKontrol2Lights\VoiceMeeterControl.csproj", "{6FA751E5-EDE3-4EDA-A337-E2AA8FA035DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

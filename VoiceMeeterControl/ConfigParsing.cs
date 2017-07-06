@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sprache;
 
-namespace nanoKontrol2Lights
+namespace VoiceMeeterControl
 {
     public static class ConfigParsing
     {

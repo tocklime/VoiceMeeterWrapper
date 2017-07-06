@@ -1,14 +1,16 @@
 ﻿using Sanford.Multimedia.Midi;
 using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using VoiceMeeterWrapper;
 
-namespace nanoKontrol2Lights
+namespace VoiceMeeterControl
 {
     class Program
     {
-        private static int GetNanoKontrolInputDevice(string partialDeviceName)
+        private static int GetMidiInputDevice(string partialDeviceName)
         {
             for (int i = 0; i < InputDevice.DeviceCount; i++)
             {
@@ -18,7 +20,7 @@ namespace nanoKontrol2Lights
             }
             throw new Exception($"Cannot find input midi device with '{partialDeviceName}' in the name.");
         }
-        private static int GetNanoKontrolOutputDevice(string partialDeviceName)
+        private static int GetMidiOutputDevice(string partialDeviceName)
         {
             for (int i = 0; i < OutputDeviceBase.DeviceCount; i++)
             {
@@ -38,14 +40,41 @@ namespace nanoKontrol2Lights
             var ans =  zeroToOne * (toMax - toMin) + toMin;
             return ans;
         }
+        public static string LoadConfig()
+        {
+            //directories to try:
+            var confDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"VoiceMeeterControl");
+            if (!Directory.Exists(confDir))
+            {
+                Directory.CreateDirectory(confDir);
+            }
+            var conf = Path.Combine(confDir,"config.txt");
+            if (!File.Exists(conf))
+            {
+                //Write it out.
+                File.WriteAllText(conf, LoadInternalConfig());
+            }
+            return File.ReadAllText(conf);
+        }
+        public static string LoadInternalConfig()
+        {
+            using (var str = Assembly.GetEntryAssembly().GetManifestResourceStream("VoiceMeeterControl.config.txt"))
+            using (var reader = new StreamReader(str))
+            {
+                var fromInternal = reader.ReadToEnd();
+                return fromInternal;
+            }
+
+        }
         static void Main(string[] args)
         {
-            var confTxt = System.IO.File.ReadAllText("nanoKontrol2.txt");
+            var internalConfig = args.Length > 0 && args[0] == "internal-config";
+            var confTxt = internalConfig ? LoadInternalConfig() : LoadConfig();
             var config = ConfigParsing.ParseConfig(confTxt);
             var inputMap = config.Bindings.Where(x => (x.Dir & BindingDir.FromBoard) != 0).ToDictionary(x => x.ControlId);
 
-            using (var od = new OutputDevice(GetNanoKontrolOutputDevice(config.DeviceName)))
-            using (var id = new InputDevice(GetNanoKontrolInputDevice(config.DeviceName)))
+            using (var od = new OutputDevice(GetMidiOutputDevice(config.DeviceName)))
+            using (var id = new InputDevice(GetMidiInputDevice(config.DeviceName)))
             using (var vb = new VmClient())
             {
                 //voicemeeter doesn't have midi bindings for arm/disarm recording. We'll do it ourselves.
