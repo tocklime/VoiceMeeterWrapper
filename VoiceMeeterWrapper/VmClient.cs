@@ -27,10 +27,14 @@ namespace VoiceMeeterWrapper
             switch (lr)
             {
                 case VbLoginResponse.OK:
+                    Console.WriteLine("Attached.");
+                    break;
                 case VbLoginResponse.AlreadyLoggedIn:
+                    Console.WriteLine("Attached. Was already logged in");
                     break;
                 case VbLoginResponse.OkVoicemeeterNotRunning:
                     //Launch.
+                    Console.WriteLine("Attached. VM Not running.");
                     break;
                 default:
                     throw new InvalidOperationException("Bad response from voicemeeter: " + lr);
@@ -50,11 +54,23 @@ namespace VoiceMeeterWrapper
         {
             return VoiceMeeterRemote.IsParametersDirty() == 1;
         }
+        private bool disposed = false;
         public void Dispose()
         {
-            _onClose?.Invoke();
-            VoiceMeeterRemote.Logout();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                Console.WriteLine($"VmClient Disposing {disposing}");
+                _onClose?.Invoke();
+                VoiceMeeterRemote.Logout();
+            }
+            disposed = true;
+        }
+        ~VmClient() { Dispose(false); }
         public void OnClose(Action a)
         {
             _onClose = a;

@@ -1,8 +1,10 @@
 ﻿using Sanford.Multimedia.Midi;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using VoiceMeeterWrapper;
 
@@ -38,6 +40,7 @@ namespace VoiceMeeterControl
         {
             var zeroToOne = ((value - fromMin) / (fromMax - fromMin));
             var ans =  zeroToOne * (toMax - toMin) + toMin;
+            //Console.WriteLine($"Scale {value} from {fromMin}..{fromMax} to {toMin}..{toMax}: {zeroToOne} {ans}");
             return ans;
         }
         public static string LoadConfig()
@@ -66,19 +69,42 @@ namespace VoiceMeeterControl
             }
 
         }
+        private delegate bool ConsoleCtrlHandlerDelegate(int sig);
+        [DllImport("Kernel32")]
+        private static extern bool SetConsoleCtrlHandler(ConsoleCtrlHandlerDelegate handler, bool add);
+        private static bool shouldStop = false;
+        private static ConsoleCtrlHandlerDelegate _handler;
+        private static bool Handler(int sig)
+        {
+            Console.WriteLine("Exiting...");
+            //Thread.Sleep(5000);
+            foreach(var x in disps)
+            {
+                x.Dispose();
+            }
+            Console.WriteLine("Cleanup done...");
+            shouldStop = true;
+            return true;
+        }
+        private static List<IDisposable> disps = new List<IDisposable>();
         static void Main(string[] args)
         {
+            _handler += new ConsoleCtrlHandlerDelegate(Handler);
+            SetConsoleCtrlHandler(_handler, true);
             var internalConfig = args.Length > 0 && args[0] == "internal-config";
             var confTxt = internalConfig ? LoadInternalConfig() : LoadConfig();
             var config = ConfigParsing.ParseConfig(confTxt);
             var inputMap = config.Bindings.Where(x => (x.Dir & BindingDir.FromBoard) != 0).ToDictionary(x => x.ControlId);
-
             using (var od = new OutputDevice(GetMidiOutputDevice(config.DeviceName)))
             using (var id = new InputDevice(GetMidiInputDevice(config.DeviceName)))
             using (var vb = new VmClient())
             {
+                disps.Add(vb);
+                disps.Add(id);
+                disps.Add(od);
                 //voicemeeter doesn't have midi bindings for arm/disarm recording. We'll do it ourselves.
                 //Note that the voicemeeter UI doesn't update until you start recording something.
+                Console.WriteLine("All initialised");
                 id.ChannelMessageReceived += (ob, e) =>
                 {
                     var m = e.Message;
@@ -108,7 +134,7 @@ namespace VoiceMeeterControl
                         od.Send(new ChannelMessage(ChannelCommand.Controller, 0, x.ControlId, (int)x.ControlFrom));
                     }
                 });
-                while (!Console.KeyAvailable)
+                while (!shouldStop)
                 {
                     if (vb.Poll())
                     {
@@ -125,6 +151,11 @@ namespace VoiceMeeterControl
                     }
                 }
             }
+        }
+
+        private static void xConsole_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

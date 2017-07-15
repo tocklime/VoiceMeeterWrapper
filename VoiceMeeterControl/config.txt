@@ -10,7 +10,8 @@
 #Mute inputs
 48 toggle <=> Strip[0].Mute;
 49 toggle <=> Strip[1].Mute;
-50 toggle <=> Strip[2].Mute;
+50 0..127 => Strip[2].Mute 1..0; # PTT!
+50 0..127 <= Strip[2].Mute 0..1; # PTT!
 51 toggle <=> Strip[3].Mute;
 52 toggle <=> Strip[4].Mute;
 
