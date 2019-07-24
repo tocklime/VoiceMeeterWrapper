@@ -95,9 +95,9 @@ namespace VoiceMeeterControl
             var confTxt = internalConfig ? LoadInternalConfig() : LoadConfig();
             var config = ConfigParsing.ParseConfig(confTxt);
             var inputMap = config.Bindings.Where(x => (x.Dir & BindingDir.FromBoard) != 0).ToDictionary(x => x.ControlId);
+            using (var vb = new VmClient())
             using (var od = new OutputDevice(GetMidiOutputDevice(config.DeviceName)))
             using (var id = new InputDevice(GetMidiInputDevice(config.DeviceName)))
-            using (var vb = new VmClient())
             {
                 disps.Add(vb);
                 disps.Add(id);
