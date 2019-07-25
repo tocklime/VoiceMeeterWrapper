@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using VoiceMeeterControl.Ranges;
 using VoiceMeeterWrapper;
 
 namespace VoiceMeeterControl
@@ -36,12 +37,10 @@ namespace VoiceMeeterControl
         {
             od.Send(new ChannelMessage(ChannelCommand.Controller, 0, controlNum, (int)value * 127));
         }
-        private static float Scale(float value, float fromMin, float fromMax, float toMin, float toMax)
+        private static int Scale(int value, IRange from, IRange to)
         {
-            var zeroToOne = ((value - fromMin) / (fromMax - fromMin));
-            var ans =  zeroToOne * (toMax - toMin) + toMin;
-            //Console.WriteLine($"Scale {value} from {fromMin}..{fromMax} to {toMin}..{toMax}: {zeroToOne} {ans}");
-            return ans;
+            var zeroToOne = from.ToFloat(value);
+            return to.FromFloat(zeroToOne);
         }
         public static string LoadConfig()
         {
@@ -113,14 +112,14 @@ namespace VoiceMeeterControl
                         if (inputMap.ContainsKey(m.Data1))
                         {
                             var v = inputMap[m.Data1];
-                            if(v.ControlToggle && m.Data2 == v.ControlTo)
+                            if(v.ControlToggle && m.Data2 == v.ControlRange.FromFloat(1))
                             {
-                                var current = vb.GetParam(v.VoicemeeterParam);
-                                vb.SetParam(v.VoicemeeterParam, v.VmTo - current);
+                                float current = vb.GetParam(v.VoicemeeterParam);
+                                vb.SetParam(v.VoicemeeterParam, 1 - current);
                             }
                             else if(!v.ControlToggle)
                             {
-                                var scaledVal = Scale(m.Data2, v.ControlFrom, v.ControlTo, v.VmFrom, v.VmTo);
+                                var scaledVal = Scale(m.Data2, v.ControlRange, v.VmRange);
                                 vb.SetParam(v.VoicemeeterParam, scaledVal);
                             }
                         }
@@ -131,7 +130,7 @@ namespace VoiceMeeterControl
                 {
                     foreach (var x in config.Bindings.Where(x => (x.Dir & BindingDir.ToBoard) != 0))
                     {
-                        od.Send(new ChannelMessage(ChannelCommand.Controller, 0, x.ControlId, (int)x.ControlFrom));
+                        od.Send(new ChannelMessage(ChannelCommand.Controller, 0, x.ControlId, x.ControlRange.FromFloat(0)));
                     }
                 });
                 while (!shouldStop)
@@ -141,7 +140,7 @@ namespace VoiceMeeterControl
                         foreach (var x in config.Bindings.Where(x => (x.Dir & BindingDir.ToBoard) != 0))
                         {
                             var vmVal = vb.GetParam(x.VoicemeeterParam);
-                            var scaled = Scale(vmVal, x.VmFrom, x.VmTo, x.ControlFrom, x.ControlTo);
+                            var scaled = Scale((int) vmVal, x.VmRange, x.ControlRange);
                             od.Send(new ChannelMessage(ChannelCommand.Controller, 0, x.ControlId, (int)scaled));
                         }
                     }

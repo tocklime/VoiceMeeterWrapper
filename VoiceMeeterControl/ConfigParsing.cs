@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sprache;
+using VoiceMeeterControl.Ranges;
 
 namespace VoiceMeeterControl
 {
@@ -23,11 +24,9 @@ namespace VoiceMeeterControl
             public BindingDir Dir { get; set; }
             public int ControlId { get; set; }
             public string VoicemeeterParam { get; set; }
-            public float ControlFrom { get; set; }
-            public float ControlTo { get; set; }
+            public IRange ControlRange { get; set; }
             public bool ControlToggle { get; set; }
-            public float VmFrom { get; set; }
-            public float VmTo { get; set; }
+            public IRange VmRange { get; set; }
         }
         public class DeviceLine
         {
@@ -51,10 +50,8 @@ namespace VoiceMeeterControl
                 Dir = b,
                 ControlId = oc,
                 VoicemeeterParam = v,
-                ControlFrom = boardRange.IsDefined ? boardRange.Get().Item1:0,
-                ControlTo = boardRange.IsDefined ? boardRange.Get().Item2:127,
-                VmFrom = vmRange.IsDefined ? vmRange.Get().Item1:0,
-                VmTo = vmRange.IsDefined ? vmRange.Get().Item2:1,
+                ControlRange = new SimpleRange(boardRange.GetOrElse(Tuple.Create<int,int>(0,127))),
+                VmRange = new SimpleRange(vmRange.GetOrElse(Tuple.Create<int,int>(0,1))),
                 ControlToggle = isToggle.IsDefined
             });
         public static Parser<Unit> readComment =>
